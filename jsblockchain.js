@@ -17,7 +17,7 @@ class Block{
 
 class BlockChain{
 	constructor(){
-		//the first variable of the array will be the genesis block created manually
+		//the first variable of the array will be the genesis block created 
 		this.chain = [this.createGenesisBlock()];
 	}
 
@@ -25,7 +25,6 @@ class BlockChain{
 		return new Block(0,"01/01/2018","This is the genesis block","0");
 	}
 	
-	//to calculate the hash
 	getLatestBlock(){
 		return this.chain[this.chain.length -1];
 	}
