@@ -7,18 +7,29 @@ class Block{
      		this.data = data;
      		this.previousHash = previousHash;
      		this.hash = this.calculateHash();
+		this.nonce = 0;
    	}
 
    	calculateHash(){
-     	//we will be using SHA256 fo generate the hash of this block
-     		return SHA256(this.index+this.timestamp+this.previousHash+JSON.stringify(this.data)).toString();
+	     	//we will be using SHA256 fo generate the hash of this block
+     		return SHA256(this.index+this.timestamp+this.previousHash+JSON.stringify(this.data)+this.nonce).toString();
    	}
+
+	mineNewBlock(difficulty){
+		//while the n°difficulty first char are != to 0 search for a nonce
+		while(this.hash.substring(0,difficulty) !== Array(difficulty + 1).join("0")){
+			this.nonce ++;
+			this.hash = this.calculateHash();
+		}
+		console.log("A new block was mined with hash : "+ this.hash);
+	}
 }
 
 class BlockChain{
 	constructor(){
 		//the first variable of the array will be the genesis block created 
 		this.chain = [this.createGenesisBlock()];
+		this.difficulty = 3;
 	}
 
 	createGenesisBlock(){
@@ -31,7 +42,7 @@ class BlockChain{
 
 	addBlock(newBlock){
 		newBlock.previousHash = this.getLatestBlock().hash;
-		newBlock.hash = newBlock.calculateHash();
+		newBlock.mineNewBlock(this.difficulty);
 		this.chain.push(newBlock);
 	}
 
@@ -61,7 +72,9 @@ let block2 = new Block(2,"03/01/2018",{mybalance : 50});
 let myBlockChain = new BlockChain();
 
 // add to our blockchain
+console.log("the first block creation");
 myBlockChain.addBlock(block1);
+console.log("the second block creation");
 myBlockChain.addBlock(block2);
 
 console.log(JSON.stringify(myBlockChain,null,4));
