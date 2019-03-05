@@ -1,10 +1,16 @@
 const SHA256 = require("crypto-js/sha256");
 
+class Transaction{
+	constructor(fromAddress,toAddress, amout){
+		this.fromAddress = fromAddress;
+		this.toAddress = toAddress;
+		this.amount = amount;
+	}
+}
 class Block{
-	constructor(index, timestamp, data, previousHash = ''){
-		this.index = index;
+	constructor(index, timestamp, transaction, previousHash = ''){
      		this.timestamp = timestamp;
-     		this.data = data;
+     		this.transaction = transaction;
      		this.previousHash = previousHash;
      		this.hash = this.calculateHash();
 		this.nonce = 0;
@@ -12,7 +18,7 @@ class Block{
 
    	calculateHash(){
 	     	//we will be using SHA256 fo generate the hash of this block
-     		return SHA256(this.index+this.timestamp+this.previousHash+JSON.stringify(this.data)+this.nonce).toString();
+     		return SHA256(this.timestamp+this.previousHash+JSON.stringify(this.transaction)+this.nonce).toString();
    	}
 
 	mineNewBlock(difficulty){
@@ -29,22 +35,36 @@ class BlockChain{
 	constructor(){
 		//the first variable of the array will be the genesis block created 
 		this.chain = [this.createGenesisBlock()];
-		this.difficulty = 3;
+		this.difficulty = 2;
+		this.pendingTransaction = [];
+		this.miningReward = 10;
 	}
 
 	createGenesisBlock(){
-		return new Block(0,"01/01/2018","This is the genesis block","0");
+		return new Block("01/01/2018","This is the genesis block","0");
 	}
 	
 	getLatestBlock(){
 		return this.chain[this.chain.length -1];
 	}
 
-	addBlock(newBlock){
-		newBlock.previousHash = this.getLatestBlock().hash;
-		newBlock.mineNewBlock(this.difficulty);
-		this.chain.push(newBlock);
+	minePendingTransactions(miningRewardAddress){
+		let block = new Block(Date.now(), this.pendingTransactions, this.getLatestBlock().hash);
+		block.mineNewBlock(this.difficulty);
+		console.log("Block mined successfully");
+
+		this.chain.push(block);
+		//fromAddress = null for demo purpose, the fromAddress shoudl pay the "gas" or "miners fee"
+		this.pendingTransaction = [
+			new Transaction(null,miningRewardAddress,this.miningReward)
+		];
 	}
+	//this will be replace because add and approuve only one block
+	//addBlock(newBlock){
+	//	newBlock.previousHash = this.getLatestBlock().hash;
+	//	newBlock.mineNewBlock(this.difficulty);
+	//	this.chain.push(newBlock);
+	//}
 
 	checkBlockChainValid(){
 		for(let i=1; i< this.chain.length; i++){
@@ -64,25 +84,7 @@ class BlockChain{
 }
 
 
-//creating new block
-let block1 = new Block(1,"02/01/2018",{mybalance : 100});
-let block2 = new Block(2,"03/01/2018",{mybalance : 50});
 
-//create a new blockchain
-let myBlockChain = new BlockChain();
 
-// add to our blockchain
-console.log("the first block creation");
-myBlockChain.addBlock(block1);
-console.log("the second block creation");
-myBlockChain.addBlock(block2);
 
 console.log(JSON.stringify(myBlockChain,null,4));
-console.log("Validation check for the BlockChain :"+ myBlockChain.checkBlockChainValid());
-
-
-myBlockChain.chain[1].data = {mybalance : 5000}
-
-console.log(JSON.stringify(myBlockChain,null,4));
-console.log("Validation check for the BlockChain after hacking:"+ myBlockChain.checkBlockChainValid());
-
