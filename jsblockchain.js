@@ -47,7 +47,7 @@ class BlockChain{
 	getLatestBlock(){
 		return this.chain[this.chain.length -1];
 	}
-
+	// TODO manage amount of tx not sufficient
 	minePendingTransactions(miningRewardAddress){
 		let block = new Block(Date.now(), this.pendingTransaction, this.getLatestBlock().hash);
 		console.log(block);
