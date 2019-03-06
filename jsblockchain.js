@@ -1,14 +1,14 @@
 const SHA256 = require("crypto-js/sha256");
 
 class Transaction{
-	constructor(fromAddress,toAddress, amout){
+	constructor(fromAddress,toAddress, amount){
 		this.fromAddress = fromAddress;
 		this.toAddress = toAddress;
 		this.amount = amount;
 	}
 }
 class Block{
-	constructor(index, timestamp, transaction, previousHash = ''){
+	constructor(timestamp, transaction, previousHash = ''){
      		this.timestamp = timestamp;
      		this.transaction = transaction;
      		this.previousHash = previousHash;
@@ -49,7 +49,8 @@ class BlockChain{
 	}
 
 	minePendingTransactions(miningRewardAddress){
-		let block = new Block(Date.now(), this.pendingTransactions, this.getLatestBlock().hash);
+		let block = new Block(Date.now(), this.pendingTransaction, this.getLatestBlock().hash);
+		console.log(block);
 		block.mineNewBlock(this.difficulty);
 		console.log("Block mined successfully");
 
@@ -59,12 +60,27 @@ class BlockChain{
 			new Transaction(null,miningRewardAddress,this.miningReward)
 		];
 	}
-	//this will be replace because add and approuve only one block
-	//addBlock(newBlock){
-	//	newBlock.previousHash = this.getLatestBlock().hash;
-	//	newBlock.mineNewBlock(this.difficulty);
-	//	this.chain.push(newBlock);
-	//}
+	
+	createTransaction(transaction){
+		this.pendingTransaction.push(transaction);
+	}
+
+	getBalanceOfAddress(address){
+		let balance = 0;
+
+		for(const block of this.chain){
+			for(const trans of block.transaction){
+				if(trans.fromAddress === address){
+					balance=balance-trans.amount;
+				}
+
+				if(trans.toAddress === address){
+					balance=balance+trans.amount;
+				}
+			}
+		}
+		return balance;
+	}
 
 	checkBlockChainValid(){
 		for(let i=1; i< this.chain.length; i++){
@@ -83,8 +99,19 @@ class BlockChain{
 
 }
 
+let bittyCoin = new BlockChain();
+transaction1 = new Transaction("tom", "jerry", 100);
+bittyCoin.createTransaction(transaction1);
+
+transaction2 = new Transaction("jerry", "tom", 30);
+bittyCoin.createTransaction(transaction2);
 
 
+console.log("Started mining by the miner...");
+bittyCoin.minePendingTransactions("donald");
 
-
-console.log(JSON.stringify(myBlockChain,null,4));
+console.log("balance for tom is:" + bittyCoin.getBalanceOfAddress("tom"));
+console.log("balance for jerry is:" + bittyCoin.getBalanceOfAddress("jerry"));
+console.log("balance for donald is:" + bittyCoin.getBalanceOfAddress("donald"));
+bittyCoin.minePendingTransactions("donald");
+console.log("balance for donald is:" + bittyCoin.getBalanceOfAddress("donald"));
