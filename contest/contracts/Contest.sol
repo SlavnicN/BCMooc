@@ -1,14 +1,14 @@
-pragma solidity 0.4.24;
+pragma solidity 0.5.8;
 
 //creating the contract 
-contract Constest{
+contract Contest{
 
 	//declaring variables
 	string public contestant;
 
 
 	// declaring constructor
-	function Contest() public {
+	constructor() public {
 		contestant = "Tom";		
 	} 
 }
