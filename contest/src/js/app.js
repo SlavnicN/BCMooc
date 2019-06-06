@@ -26,8 +26,9 @@ $.getJSON("Contest.json", function(contest){
   App.contracts.Contest = TruffleContract(contest);
   //Connect provider to interact with contract
   App.contracts.Contest.setProvider(App.web3Provider);
+  return App.render();
 });
-    return App.render();
+    
   },
 
 render: function (){
@@ -67,7 +68,7 @@ render: function (){
     }
 
     loader.hide(); 
-    contest.show();
+    content.show();
   }).catch(function(error){
     console.warn(error);
   });
